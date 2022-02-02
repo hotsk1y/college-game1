@@ -1,10 +1,23 @@
-function getElById(id) {
+const getElById = (id) => {
     return document.getElementById(id);
 }
 
 const btn = getElById('btn-kick');
 const btn2 = getElById('btn-kick-2');
 const $logs = document.querySelector('#logs');
+
+const countClicks = (limitClicks) => {
+    return () => limitClicks > 0 ? --limitClicks : limitClicks = 0;
+}
+
+const btn1_RemainClicks = countClicks(7);
+const btn2_RemainClicks = countClicks(7);
+
+const changeButtonName = (btn, clicks) => {
+    let btnName = btn.textContent.split('').slice(0, btn.textContent.length - 3).join('');
+
+    return `${btnName} (${clicks})`;
+}
 
 const character = {
     name: 'Pikachu',
@@ -30,29 +43,28 @@ const enemy = {
     renderProgressbarHP: renderProgressbarHP,
 }
 
-function renderHPLife() {
+const renderHPLife = () => {
     this.elHP.textContent = this.damageHP + ' / ' + this.defaultHp;
 }
 
-function renderProgressbarHP() {
+const renderProgressbarHP = () => {
     this.elProgressbar.style.width = this.damageHP + '%';
 }
 
-function renderHP() {
+const renderHP = () => {
     this.renderHPLife();
     this.renderProgressbarHP();
 }
 
-function changeHP(count) {
+const changeHP = (count) => {
     this.damageHP -= count;
 
     const log = this === enemy ? generateLog(this, character) : generateLog(this, enemy);
 
-    $logs.scrollTop = 0;
-
     const $p = document.createElement('p');
     $p.innerText = `${log} (-${count}HP [${this.damageHP}/${this.defaultHp}])`;
     $logs.insertBefore($p, $logs.children[0]);
+    $logs.scrollTop = 0;
 
     // console.log(`${log} (-${count}HP [${this.damageHP}/${this.defaultHp}])`);
 
@@ -66,7 +78,7 @@ function changeHP(count) {
     this.renderHP();
 }
 
-function random(num) {
+const random = (num) => {
     return (Math.ceil(Math.random() * num));
 }
 
@@ -75,16 +87,28 @@ btn.addEventListener('click', function () {
 
     character.changeHP(random(20));
     enemy.changeHP(random(20));
+
+    let remainClicks = btn1_RemainClicks();
+
+    btn.textContent = changeButtonName(btn, remainClicks);
+
+    if (!remainClicks) btn.disabled = true;
 })
 
 btn2.addEventListener('click', function () {
     console.log('Kick-2');
 
-    character.changeHP(random(5));
-    enemy.changeHP(random(5));
+    character.changeHP(random(10));
+    enemy.changeHP(random(10));
+
+    let remainClicks = btn2_RemainClicks();
+
+    btn2.textContent = changeButtonName(btn2, remainClicks);
+
+    if (!remainClicks) btn2.disabled = true;
 })
 
-function generateLog({name: first}, {name: second}) {
+const generateLog = ({ name: first }, { name: second }) => {
     const logs = [
         `${first} вспомнил что-то важное, но неожиданно ${second}, не помня себя от испуга, ударил в предплечье врага.`,
         `${first} поперхнулся, и за это ${second} с испугу приложил прямой удар коленом в лоб врага.`,
@@ -101,8 +125,11 @@ function generateLog({name: first}, {name: second}) {
     return logs[random(logs.length) - 1];
 }
 
-function init() {
+const init = () => {
     console.log('Start Game!');
+
+    btn.textContent += ' (7)';
+    btn2.textContent += ' (7)';
 
     character.renderHP();
     enemy.renderHP();
