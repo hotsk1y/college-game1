@@ -8,7 +8,7 @@ export function random(max, min = 0) {
     return Math.ceil(Math.random() * num) + min;
 }
 
-export default function countClicks(limitClicks) {
+export function countClicks(limitClicks) {
     return () => limitClicks > 0 ? --limitClicks : limitClicks = 0;
 }
 
